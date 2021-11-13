@@ -1,19 +1,24 @@
 import { Component } from "react";
 import Square from "./Square";
+import calculateWiner from "./Utilities"
 
 class Board extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            squeres: Array(9).fill(null)
+            squeres: Array(9).fill(null),
+            xIsNext: true
         }
     }
 
     handleClick (squerNumber) {
         console.log("hize click" + squerNumber)
         const copySqueres = this.state.squeres.slice()
-        copySqueres[squerNumber] = 'X'
-        this.setState({squeres: copySqueres})
+        if (calculateWiner(copySqueres) || copySqueres[squerNumber]) {
+            return
+        }
+        copySqueres[squerNumber] = this.state.xIsNext ? 'X' : 'O'
+        this.setState({squeres: copySqueres, xIsNext: !this.state.xIsNext})
     }
 
 
@@ -23,8 +28,16 @@ class Board extends Component {
             value={this.state.squeres[i]}
             onClickAccion={() => this.handleClick(i) }/>)
     }
+
+
     render() {
-        const status = "Next player: X"
+        const winner = calculateWiner(this.state.squeres)
+        let status
+        if (winner) {
+            status = `the winner is ${winner} !!`
+        } else {
+            status = `Next player: ${this.state.xIsNext ? 'X' : 'O'}`
+        }
         const squareItems = (arrIds) => arrIds.map(id => {
             return this.renderSquare(id)
         })
