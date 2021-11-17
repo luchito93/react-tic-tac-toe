@@ -18,4 +18,4 @@ function calculateWiner (squares) {
       return null;
 }
 
-export { calculateWiner as default }
+export { calculateWiner }
