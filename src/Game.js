@@ -11,13 +11,14 @@ class Game extends Component {
                     squeres: Array(9).fill(null)
                 }
             ],
-            xIsNext: true
+            xIsNext: true,
+            stepNumber: 0
         }
     }
 
     handleClick (squerNumber) {
         console.log("hize click" + squerNumber)
-        const { history } = this.state
+        const history = this.state.history.slice(0, this.state.stepNumber + 1)
         const current = history[history.length - 1]
         const copySqueres = current.squeres.slice()
         if (calculateWiner(copySqueres) || copySqueres[squerNumber]) {
@@ -26,15 +27,32 @@ class Game extends Component {
         copySqueres[squerNumber] = this.state.xIsNext ? 'X' : 'O'
         this.setState({
             history: [...history, {squeres: [...copySqueres]}],
-            xIsNext: !this.state.xIsNext
+            xIsNext: !this.state.xIsNext,
+            stepNumber: history.length
+        })
+    }
+
+    jump(moveIdx) {
+        this.setState({
+            stepNumber: moveIdx,
+            xIsNext: (moveIdx % 2) === 0
         })
     }
 
     render() {
         const { history } = this.state
-        const current = history[history.length - 1]
-        console.log(current)
+        const current = history[this.state.stepNumber]
         const winner = calculateWiner(current.squeres)
+
+        const moves = history.map((step, moveIdx) => {
+            const desc = moveIdx ? `Ir al movimiento ${moveIdx}` : `Ir al inicio`
+            return (
+                <li key={moveIdx}>
+                    <button onClick={() => this.jump(moveIdx)}>{desc}</button>
+                </li>
+            )
+        })
+
         let status
         if (winner) {
             status = `the winner is ${winner} !!`
@@ -48,7 +66,7 @@ class Game extends Component {
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
-                    <ol></ol>
+                    <ol>{moves}</ol>
                 </div>
             </div>
         )
